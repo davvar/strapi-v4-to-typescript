@@ -1,6 +1,6 @@
 {
   "name": "strapi-v4-to-typescript",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert the strapi schemas to typescript interfaces.",
   "main": "index.js",
   "bin": {
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/erikvullings/strapi-to-typescript.git"
+    "url": "git+https://github.com/lukassos/strapi-v4-to-typescript.git"
   },
   "keywords": [
     "Strapi",
@@ -36,7 +36,7 @@
     "Anthony Perron <perron.anthony@gmail.com> (http://anthonyperron.fr)"
   ],
   "kudos": [
-    "Big thanks to all authors and contributors on strapi-to-typescript, without which this fork could not exist!"
+    "Big thanks to all authors and contributors on strapi-v4-to-typescript, without which this fork could not exist!"
   ],
   "license": "MIT",
   "bugs": {

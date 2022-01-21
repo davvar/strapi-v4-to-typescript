@@ -1,4 +1,4 @@
-# Strapi-to-TypeScript
+# Strapi-v4-to-typescript
 
 
 <span><a href="https://www.npmjs.com/package/strapi-v4-to-typescript" title="View this project on NPM"><img src="https://img.shields.io/npm/v/strapi-v4-to-typescript.svg" alt="NPM version" /></a></span>
@@ -11,14 +11,14 @@ Convert the Strapi models to TypeScript interfaces by processing each of the `./
 ## Install and Run
 
 ```shell
-npm install -g strapi-to-typescript
+npm install -g strapi-v4-to-typescript
 
 s4ts path/to/strapi/api/ -o path/to/your/types/dir/
 
 # see all doc
 s4ts -h
 
-# external conf. see: strapi-to-typescript/index.d.ts for format
+# external conf. see: strapi-v4-to-typescript/index.d.ts for format
 s4ts -c .stsconfig.js
 ```
 
@@ -71,7 +71,7 @@ path to configuration file
 ```javascript
 
 /**
- * @type {import('strapi-to-typescript')}
+ * @type {import('strapi-v4-to-typescript')}
  */
 const config = {
 

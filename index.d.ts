@@ -84,6 +84,6 @@ export interface IConfigOptions extends ICommandOptions {
     addField: (interfaceName: string) => { name: string, type: string }[]
 }
 
-declare module 'strapi-to-typescript' {
+declare module 'strapi-v4-to-typescript' {
     export = IConfigOptions
 }
