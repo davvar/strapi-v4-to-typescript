@@ -3,19 +3,37 @@ import * as path from 'path';
 import { IStrapiModel, IStrapiModelAttribute } from './models/strapi-model';
 import { IConfigOptions } from '..';
 
+/**
+ * Use case : Passes realtional links from attributes to imports.
+ */
+interface IStrapiSimpleApiRelation{
+  // interface name
+  interfaceName?:string;
+  // target is used by strapi-v4 as internal file system uri
+  // it consists from 3 parts contentCategory::contentTypeCategory.contentType
+  // contentCategory - such as api, plugin, ...
+  // contentTypeCategory
+  // contentType
+  // eg. "api::account.account"
+  target?:string;
+  // extracted from target
+  contentCategory:string;
+  contentTypeCategory:string;
+  contentType:string;
+}
 interface IStrapiModelExtended extends IStrapiModel {
   // use to output filename
   ouputFile: string;
   // interface name
   interfaceName: string;
-  // model name extract from *.settings.json filename. Use to link model.
+  // model name extract from */schema.json filename. Use to link model.
   modelName: string;
 }
 
 const util = {
 
   // InterfaceName
-  defaultToInterfaceName: (name: string) => name ? `I${name.replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
+  defaultToInterfaceName: (name: string) => name ? `I${name.replace(/-/g,' ').replace(/^./, (str: string) => str.toUpperCase()).replace(/[ ]+./g, (str: string) => str.trimLeft().toUpperCase()).replace(/\//g, '')}` : 'any',
   overrideToInterfaceName: undefined as IConfigOptions['interfaceName'] | undefined,
   toInterfaceName(name: string, filename: string) {
     return util.overrideToInterfaceName ? util.overrideToInterfaceName(name, filename) || util.defaultToInterfaceName(name) : this.defaultToInterfaceName(name);
@@ -35,6 +53,30 @@ const util = {
   overrideOutputFileName: undefined as IConfigOptions['outputFileName'] | undefined,
   toOutputFileName(modelName: string, isComponent: boolean | undefined, configNested: boolean | undefined, interfaceName: string, filename: string) {
     return this.overrideOutputFileName ? this.overrideOutputFileName(interfaceName, filename) || this.defaultOutputFileName(modelName, isComponent, configNested) : this.defaultOutputFileName(modelName, isComponent, configNested);
+  },
+
+  defaultAttributeNameToInterfaceName: (model: IStrapiModelAttribute, shouldIncludeCollection: boolean = false) => {
+    if(model.target){
+      const target = model.target.split('.').splice(-1)[0] || model.target || "relation";
+      const isCollection = shouldIncludeCollection && model.relation ? (/many/.test(model.relation)) : false;
+      return `${util.toInterfaceName( target, "")}${(isCollection) ? '[]' : ''}`;
+    }
+    return 'relation';
+  },
+
+  attributeToSimpleRelationOrUndef: (model: IStrapiModelAttribute) => {
+    if(model.target){
+      const targetSplit:string[] = model.target.split(/[.:]+/); 
+      const relation :IStrapiSimpleApiRelation = {
+        interfaceName: util.defaultAttributeNameToInterfaceName(model),
+        target: model.target,
+        contentCategory: targetSplit[0] || '',
+        contentTypeCategory: targetSplit[1] || '',
+        contentType: targetSplit[2] || '',
+      }
+      return relation;
+    }
+    return undefined;
   },
 
   /**
@@ -60,6 +102,17 @@ const util = {
           return model.enum ? util.toEnumName(fieldName, interfaceName) : 'string';
         } else {
           return model.enum ? `"${model.enum.join(`" | "`)}"` : 'string';
+        }
+      case 'relation':
+        {
+          return util.defaultAttributeNameToInterfaceName(model, true);
+        }
+      case 'component':
+        {
+          return model.component ? 
+          util.toInterfaceName(model.component, "")
+          : 
+          'component';
         }
       case 'date':
       case 'datetime':
@@ -129,7 +182,10 @@ class Converter {
 
       const modelName = m._isComponent ?
         path.dirname(m._filename).split(path.sep).pop() + '.' + path.basename(m._filename, '.json')
-        : path.basename(m._filename, '.settings.json');
+        : ""+path.dirname(m._filename).split(path.sep).pop();
+      // const modelName = m._isComponent ?
+      //   path.dirname(m._filename).split(path.sep).pop() + '.' + path.basename(m._filename, '.json')
+      //   : path.basename(m._filename, '.schema.json');
       const interfaceName = util.toInterfaceName(m.info.name, m._filename);
       const ouputFile = util.toOutputFileName(modelName, m._isComponent, config.nested, interfaceName, m._filename)
       return {
@@ -171,7 +227,18 @@ class Converter {
   strapiModelToInterface(m: IStrapiModelExtended) {
     const result: string[] = [];
 
-    result.push(...this.strapiModelExtractImports(m));
+    const apiImports: IStrapiSimpleApiRelation[] = [];
+
+    // filter out relational attributes to link content-types among themselves
+    if (m.attributes) for (const aName in m.attributes) {
+      if ((util.excludeField && util.excludeField(m.interfaceName, aName)) || !m.attributes.hasOwnProperty(aName)) continue;
+      const relation = util.attributeToSimpleRelationOrUndef(m.attributes[aName]);
+      if(relation){
+        apiImports.push(relation);
+      }
+    }
+
+    result.push(...this.strapiModelExtractImports(m,apiImports));
     if (result.length > 0) result.push('')
 
     result.push('/**');
@@ -209,7 +276,7 @@ class Converter {
    * @param m Strapi model to examine
    * @param structure Overall output structure
    */
-  strapiModelExtractImports(m: IStrapiModelExtended) {
+  strapiModelExtractImports(m: IStrapiModelExtended, apiRelations: IStrapiSimpleApiRelation[]) {
     const toImportDefinition = (name: string) => {
       const found = findModel(this.strapiModels, name);
       const toFolder = (f: IStrapiModelExtended) => {
@@ -237,6 +304,11 @@ class Converter {
         .map(toImportDefinition));
     }
 
+    apiRelations.forEach(rel => {
+        imports.push(`import { ${rel.interfaceName} } from './${rel.contentType}';`);
+      }
+    )
+
     return imports
       .filter((value, index, arr) => arr.indexOf(value) === index) // is unique
       .sort()
@@ -258,12 +330,12 @@ class Converter {
   ) {
     const findModelName = (n: string) => {
       const result = findModel(this.strapiModels, n);
-      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains */schema.json with info.name === '${n}'`)
       return result ? result.interfaceName : 'any';
     };
     const buildDynamicZoneComponent = (n: string) => {
       const result = findModel(this.strapiModels, n);
-      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains *.settings.json with info.name === '${n}'`)
+      if (!result && n !== '*') console.debug(`type '${n}' unknown on ${interfaceName}[${name}] => fallback to 'any'. Add in the input arguments the folder that contains */schema.json with info.name === '${n}'`)
       return result ? `    | ({ __component: '${result.modelName}' } & ${result.interfaceName})\n` : 'any';
     };
 

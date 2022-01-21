@@ -1,15 +1,16 @@
 {
-  "name": "strapi-to-typescript",
-  "version": "2.0.14",
-  "description": "Convert the strapi models to typescript interfaces.",
+  "name": "strapi-v4-to-typescript",
+  "version": "1.0.0",
+  "description": "Convert the strapi schemas to typescript interfaces.",
   "main": "index.js",
   "bin": {
-    "sts": "./bin/run.js"
+    "s4ts": "./bin/run.js"
   },
   "scripts": {
     "start": "tsc -w",
     "prebuild": "rm -rf ./dist",
     "build": "tsc && cp ./src/.stsconfig.js ./dist",
+    "rebuild": "npm run prebuild && npm run build",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "minor-release": "npm version minor && npm publish && git push --follow-tags",
     "pretest": "rm -rf ./src/test/out*",
@@ -23,19 +24,25 @@
   },
   "keywords": [
     "Strapi",
+    "Strapi-v4",
     "TypeScript",
+    "schema",
     "model",
     "generator"
   ],
-  "author": "Erik Vullings <erik.vullings@gmail.com> (http://www.tno.nl)",
+  "author": "Lukas Puchon <lukassos@gmail.com> (https://lupu.sk)",
   "contributors": [
+    "Erik Vullings <erik.vullings@gmail.com> (http://www.tno.nl)",
     "Anthony Perron <perron.anthony@gmail.com> (http://anthonyperron.fr)"
+  ],
+  "kudos": [
+    "Big thanks to all authors and contributors on strapi-to-typescript, without which this fork could not exist!"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/erikvullings/strapi-to-typescript/issues"
+    "url": "https://github.com/lukassos/strapi-v4-to-typescript/issues"
   },
-  "homepage": "https://github.com/erikvullings/strapi-to-typescript#readme",
+  "homepage": "https://github.com/lukassos/strapi-v4-to-typescript#readme",
   "dependencies": {
     "command-line-args": "^5.1.1",
     "command-line-usage": "^5.0.5"

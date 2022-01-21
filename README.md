@@ -1,36 +1,36 @@
 # Strapi-to-TypeScript
 
 
-<span><a href="https://www.npmjs.com/package/strapi-to-typescript" title="View this project on NPM"><img src="https://img.shields.io/npm/v/strapi-to-typescript.svg" alt="NPM version" /></a></span>
-<span><a href="https://www.npmjs.com/package/strapi-to-typescript" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/strapi-to-typescript.svg" alt="NPM download" /></a></span>
-<span><a href="https://github.com/erikvullings/strapi-to-typescript/" title="View this project on Github"><img src="https://img.shields.io/github/contributors/erikvullings/strapi-to-typescript" alt="contributors" /></a></span>
+<span><a href="https://www.npmjs.com/package/strapi-v4-to-typescript" title="View this project on NPM"><img src="https://img.shields.io/npm/v/strapi-v4-to-typescript.svg" alt="NPM version" /></a></span>
+<span><a href="https://www.npmjs.com/package/strapi-v4-to-typescript" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/strapi-v4-to-typescript.svg" alt="NPM download" /></a></span>
+<span><a href="https://github.com/lukassos/strapi-v4-to-typescript/" title="View this project on Github"><img src="https://img.shields.io/github/contributors/lukassos/strapi-v4-to-typescript" alt="contributors" /></a></span>
 
 
-Convert the Strapi models to TypeScript interfaces by processing each of the `./api/**/models/*.settings.json` recursively.
+Convert the Strapi models to TypeScript interfaces by processing each of the `./api/**/models/*/schema.json` recursively.
 
 ## Install and Run
 
 ```shell
 npm install -g strapi-to-typescript
 
-sts path/to/strapi/api/ -o path/to/your/types/dir/
+s4ts path/to/strapi/api/ -o path/to/your/types/dir/
 
 # see all doc
-sts -h
+s4ts -h
 
 # external conf. see: strapi-to-typescript/index.d.ts for format
-sts -c .stsconfig.js
+s4ts -c .stsconfig.js
 ```
 
 ## Command line option
 
-`sts input -g components -o output ...`
+`s4ts input -g components -o output ...`
 
 ### required
 * **input**  
-Strapi folder(s)/file(s) with models *.settings.json  
+Strapi folder(s)/file(s) with models */schema.json  
 You may define multiple inputs. In case your API models have relations to other plugins like 'users-permissions'.
-`sts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/`  
+`s4ts path/to/strapi/api/ path/to/strapi/plugins/users-permissions/models -o path/to/your/types/dir/`  
   * Order matters, if you have two models with the same name, the last one is used.  
   * Add '!' to exclude folder or subfolder, ex: `!path/to/strapi/plugins_excluded`.
 
@@ -40,7 +40,7 @@ Strapi folder(s) with components models
 ### optional
 * **-o output**  
 Output folder
-* **-n nested**  
+* **-n nested** - deprecated in Strapi v4 - broke file structure
 Put all interfaces in a nested tree instead of directly under the output folder
 * **-u collectionCanBeUndefined**  
 By default, all collection can not be undefined. You can turn this off, so only unrequired collections may be undefined.
@@ -108,7 +108,7 @@ package.json
   "//" : "...",
 
   "scripts": {
-    "sts": "sts -c .stsconfig"
+    "sts": "s4ts -c .stsconfig"
   },
 
   "///" : "..."
@@ -141,3 +141,23 @@ The input folder is recursively processed and each model file is read. When done
 npm install && npm run build
 # output files generated in dist folder
 ```
+
+
+
+## Strapi v4 EDIT 
+----
+
+Modified this repo to make interfaces from strapi v4 file structure, this breaks original functionality so please use this wisely and on Strapi v4 only.
+
+### WARNING
+option -n was broken - thus removed 
+
+### Usage
+```
+rm ./.s4ts -rf && s4ts ./src/api ./src/extensions -g ./src/components -o ./.s4ts 
+```
+
+## KUDOS !! 
+
+    "Big thanks to all authors and contributors on strapi-to-typescript, without which this fork could not exist!"
+

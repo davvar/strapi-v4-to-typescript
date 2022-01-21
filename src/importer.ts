@@ -54,7 +54,7 @@ const walk = (
   });
 };
 
-export const findFiles = (dir: string, ext: RegExp = /.settings.json$/, exclude: string[] = []) =>
+export const findFiles = (dir: string, ext: RegExp = /schema.json$/, exclude: string[] = []) =>
   new Promise<string[]>((resolve, reject) => {
     walk(
       dir,
@@ -78,7 +78,7 @@ export async function findFilesFromMultipleDirectories(...files: string[]): Prom
   const exclude = files.filter(f => f.startsWith("!")).map(f => f.replace(/^!/, ''))
   const inputs = [... new Set(files.filter(f => !f.startsWith("!")))]
 
-  var actions = inputs.map(i => fs.statSync(i).isFile() ? [i] : findFiles(i, /.settings.json$/, exclude)); // run the function over all items
+  var actions = inputs.map(i => fs.statSync(i).isFile() ? [i] : findFiles(i, /schema.json$/, exclude)); // run the function over all items
 
   // we now have a promises array and we want to wait for it
 

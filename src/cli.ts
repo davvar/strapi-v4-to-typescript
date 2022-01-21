@@ -27,7 +27,7 @@ export class CommandLineInterface {
       multiple: true,
       typeLabel: '{underline String}',
       defaultOption: true,
-      description: 'Input folder with the Strapi models (*.settings.json)',
+      description: 'Input folder with the Strapi models (*/schema.json)',
     },
     {
       name: 'components',
@@ -57,13 +57,13 @@ export class CommandLineInterface {
       typeLabel: '{underline String}',
       description: 'Advanced configuration file',
     },
-    {
-      name: 'nested',
-      alias: 'n',
-      type: Boolean,
-      defaultValue: false,
-      description: 'add each interface in its own folder.',
-    },
+    // {
+    //   name: 'nested',
+    //   alias: 'n',
+    //   type: Boolean,
+    //   defaultValue: false,
+    //   description: 'add each interface in its own folder.',
+    // },
     {
       name: 'enum',
       alias: 'e',
@@ -87,7 +87,7 @@ export class CommandLineInterface {
 
     ${npmPackage.description}
 
-    Usage: sts ([OPTION]...) [INPUT FOLDER]...
+    Usage: s4ts ([OPTION]...) [INPUT FOLDER]...
     `,
     },
     {
@@ -99,27 +99,27 @@ export class CommandLineInterface {
       content: [
         {
           desc: '01. Convert the Strapi API folder and write the results to current folder.',
-          example: '$ sts ./api',
+          example: '$ s4ts ./api',
         },
         {
           desc: '02. Convert the Strapi API folder and write the results to output folder.',
-          example: '$ sts ./api -o ./sts',
+          example: '$ s4ts ./api -o ./sts',
         },
         {
           desc: '03. Convert the Strapi API folder with components and write the results to output folder.',
-          example: '$ sts ./api -g ./components -o ./sts',
+          example: '$ s4ts ./api -g ./components -o ./sts',
         },
         {
-          desc: '04. Add each interface to its own folder.',
-          example: '$ sts ./api -o ./sts -n',
+          desc: '04. Add each interface to its own folder. >> BROKEN => REMOVED for Strapi v4',
+          example: '$ s4ts ./api -o ./s4ts -n',
         },
         {
           desc: '05. Define multiple input folders.',
-          example: '$ sts ./api ./node_modules/strapi-plugin-users-permissions/models/ ./node_modules/strapi-plugin-upload/models/',
+          example: '$ s4ts ./api ./node_modules/strapi-plugin-users-permissions/models/ ./node_modules/strapi-plugin-upload/models/',
         },
         {
           desc: `06. Use advanced configuration. See example: ${examplePath()}`,
-          example: '$ sts -c ./stsconfig.js',
+          example: '$ s4ts -c ./stsconfig.js',
         }
       ],
     },

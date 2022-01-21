@@ -7,7 +7,7 @@ const logError = console.error;
 
 export const exec = async (options: IConfigOptions) => {
   try {
-    // find *.settings.json
+    // find */schema.json
     let strapiModels = await importFiles(await findFilesFromMultipleDirectories(...options.input));
 
     if (options.inputGroup) console.log("option '--inputGroup' is deprecated use '--components'.");
