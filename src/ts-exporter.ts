@@ -58,7 +58,7 @@ const util = {
   defaultAttributeNameToInterfaceName: (model: IStrapiModelAttribute, shouldIncludeCollection: boolean = false) => {
     if(model.target){
       const target = model.target.split('.').splice(-1)[0] || model.target || "relation";
-      const isCollection = shouldIncludeCollection && model.relation ? (/many/.test(model.relation)) : false;
+      const isCollection = shouldIncludeCollection && model.relation ? (/ToMany/.test(model.relation)) : false;
       return `${util.toInterfaceName( target, "")}${(isCollection) ? '[]' : ''}`;
     }
     return 'relation';
