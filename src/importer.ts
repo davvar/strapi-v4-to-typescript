@@ -72,7 +72,7 @@ export const findFiles = (dir: string, ext: RegExp = /schema.json$/, exclude: st
 
 /**
  * Wrapper around "findFiles".
- * 
+ *
  */
 export async function findFilesFromMultipleDirectories(...files: string[]): Promise<string[]> {
   const exclude = files.filter(f => f.startsWith("!")).map(f => f.replace(/^!/, ''))
@@ -106,10 +106,12 @@ export const importFiles = (files: string[], results: IStrapiModel[] = [], merge
 
         if(strapiModel.info && !strapiModel.info.name && strapiModel.info.displayName)
           strapiModel.info.name = strapiModel.info.displayName;
-        
+
         if (strapiModel.info && strapiModel.info.name) {
 
-          let sameNameIndex = results.map(s => s.info.name).indexOf(strapiModel.info.name);
+          let sameNameIndex = results
+            .map((s) => s.info.singularName)
+            .indexOf(strapiModel.info.name);
           if (sameNameIndex === -1) {
             results.push(strapiModel);
           } else {
